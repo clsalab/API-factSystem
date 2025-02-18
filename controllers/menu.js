@@ -9,7 +9,7 @@ const getItems = async (req, res) => {
     const data = await MenuModel.find({});  // Aquí usamos la función find
     res.send({ data });
   } catch (error) {
-    handleHttpError(res, "*** Error al consultar Categoria ***");
+    handleHttpError(res, "*** Error al consultar Menu ***");
   }
 };
 
@@ -17,11 +17,11 @@ const getItem = async (req, res) => {
 
   try {
 
-    const data = await MenuModel.findById(req.params.id); // Busca la categoría por ID
-    if (!data) return res.status(404).send({ message: 'Categoría no encontrada' });
+    const data = await MenuModel.findById(req.params.id); // Busca la Menu por ID
+    if (!data) return res.status(404).send({ message: 'Menu no encontrada' });
     res.send({ data });
   } catch (error) {
-    handleHttpError(res, "*** Error al consultar Categoría ***");
+    handleHttpError(res, "*** Error al consultar Menu ***");
   }
 
 };
@@ -34,8 +34,8 @@ const createItem = async (req, res) => {
   console.log(body); // Verifica que el cuerpo esté llegando correctamente
 
   try {
-    const data = await MenuModel.create(body); // Crea la categoría en la base de datos
-    res.status(201).send({ message: 'Categoría creada con éxito', data: data });
+    const data = await MenuModel.create(body); // Crea la Menu en la base de datos
+    res.status(201).send({ message: 'Menu creado con éxito', data: data });
   } catch (error) {
     handleHttpError(res, "*** Error create Items ***");
   }
@@ -53,24 +53,24 @@ const updateItem = async (req, res) => {
 
 
 
-    // Actualizar la categoría
+    // Actualizar la Menu
     const data = await MenuModel.findOneAndUpdate(
       { _id: id },  // Buscar por ID
       body,
-      { new: true } // Retorna la categoría actualizada
+      { new: true } // Retorna la Menu actualizada
     );
 
-    // Verificar si la categoría existe
+    // Verificar si la Menu existe
     if (!data) {
-      return res.status(404).json({ message: "Categoría no encontrada" });
+      return res.status(404).json({ message: "Menu no encontrado" });
     }
 
-    res.status(200).json({ message: "Categoría actualizada con éxito", data });
+    res.status(200).json({ message: "Menu actualizado con éxito", data });
 
   } catch (e) {
     console.error("❌ Error en la actualización:", e);
 
-    handleHttpError(res, "*** Error al actualizar Categoría ***");
+    handleHttpError(res, "*** Error al actualizar Menu ***");
   }
 };
 
@@ -87,13 +87,13 @@ const deleteItem = async (req, res) => {
     const data = await MenuModel.delete({ _id: id });
 
     if (!data) {
-      return res.status(404).json({ message: "❌ Categoría no encontrada" });
+      return res.status(404).json({ message: "❌ Menu no encontrado" });
     }
 
-    res.status(200).json({ message: "✅ Categoría eliminada correctamente (soft delete)", data });
+    res.status(200).json({ message: "✅ Menu eliminado correctamente (soft delete)", data });
 
   } catch (e) {
-    console.error("❌ Error al eliminar categoría:", e);
+    console.error("❌ Error al eliminar Menu:", e);
     res.status(500).json({ error: e.message });
   }
 };

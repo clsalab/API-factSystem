@@ -1,45 +1,63 @@
 const mongoose = require('mongoose');
 const { matchedData } = require('express-validator');
-const handleHttpError = require('../utils/handleError');
+const { handleHttpError } = require('../utils/handleError'); // Verifica que la ruta sea correcta
+
 const { UsersModel }  = require('../models');
 
 const getItems = async (req, res) => {
   try {
+    const data = await UsersModel.findAllData();  // Aquí usamos la función find
 
-    const data = await UsersModel.find({});  // Aquí usamos la función find
+    console.log('Datos obtenidos:', data); // Log para verificar la respuesta
+
     res.send({ data });
   } catch (error) {
-    handleHttpError(res, "*** Error al consultar Categoria ***");
+    console.error('Error al consultar Users:', error); // Log de error detallado
+    handleHttpError(res, "*** Error al consultar Users ***", 500);
   }
 };
+
 
 const getItem = async (req, res) => {
 
   try {
 
-    const data = await UsersModel.findById(req.params.id); // Busca la categoría por ID
-    if (!data) return res.status(404).send({ message: 'Categoría no encontrada' });
+    const data = await UsersModel.findById(req.params.id); // Busca la Users por ID
+    if (!data) return res.status(404).send({ message: 'Users no encontrado' });
     res.send({ data });
   } catch (error) {
-    handleHttpError(res, "*** Error al consultar Categoría ***");
+    handleHttpError(res, "*** Error al consultar Users ***", 500);
   }
 
 };
 
 
 const createItem = async (req, res) => {
-
-  const body = matchedData(req)
+  const body = matchedData(req); // Se obtiene el cuerpo de la solicitud
 
   console.log(body); // Verifica que el cuerpo esté llegando correctamente
 
   try {
-    const data = await UsersModel.create(body); // Crea la categoría en la base de datos
-    res.status(201).send({ message: 'Categoría creada con éxito', data: data });
+    // Validación adicional (si es necesario)
+    if (!body.nombreCompleto || !body.correo || !body.clave) {
+      return res.status(400).json({ error: "Faltan datos obligatorios (nombre, correo, clave)" });
+    }
+
+    // Crear el nuevo usuario en la base de datos
+    const data = await UsersModel.create(body);
+
+    // Respuesta exitosa
+    res.status(201).send({
+      message: "Usuario creado con éxito",
+      data: data
+    });
   } catch (error) {
-    handleHttpError(res, "*** Error create Items ***");
+    // Manejo de errores más detallado
+    console.error("Error al crear el usuario:", error.message);
+    handleHttpError(res, "*** Error al crear el usuario ***", 500);
   }
 };
+
 
 
 const updateItem = async (req, res) => {
@@ -53,24 +71,24 @@ const updateItem = async (req, res) => {
 
 
 
-    // Actualizar la categoría
+    // Actualizar la Users
     const data = await UsersModel.findOneAndUpdate(
       { _id: id },  // Buscar por ID
       body,
-      { new: true } // Retorna la categoría actualizada
+      { new: true } // Retorna la Users actualizado
     );
 
-    // Verificar si la categoría existe
+    // Verificar si la Users existe
     if (!data) {
-      return res.status(404).json({ message: "Categoría no encontrada" });
+      return res.status(404).json({ message: "Users no encontrado" });
     }
 
-    res.status(200).json({ message: "Categoría actualizada con éxito", data });
+    res.status(200).json({ message: "Users actualizado con éxito", data });
 
   } catch (e) {
     console.error("❌ Error en la actualización:", e);
 
-    handleHttpError(res, "*** Error al actualizar Categoría ***");
+    handleHttpError(res, "*** Error al actualizar Users ***", 500);
   }
 };
 
@@ -87,14 +105,14 @@ const deleteItem = async (req, res) => {
     const data = await UsersModel.delete({ _id: id });
 
     if (!data) {
-      return res.status(404).json({ message: "❌ Categoría no encontrada" });
+      return res.status(404).json({ message: "❌ Users no encontrado" });
     }
 
-    res.status(200).json({ message: "✅ Categoría eliminada correctamente (soft delete)", data });
+    res.status(200).json({ message: "✅ Users eliminada correctamente (soft delete)", data });
 
   } catch (e) {
-    console.error("❌ Error al eliminar categoría:", e);
-    res.status(500).json({ error: e.message });
+    console.error("❌ Error al eliminar Users:", e);
+    handleHttpError(res, "*** Error al eliminar User ***", 500, error.stack);
   }
 };
 

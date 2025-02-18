@@ -6,9 +6,9 @@ const handleHttpError = require('../utils/handleError');
 
 const getItems = async (req, res) => {
   try {
-
+    const user = req.user
     const data = await CategoriasModel.find({});  // Aquí usamos la función find
-    res.send({ data });
+    res.send({ data, user });
   } catch (error) {
     handleHttpError(res, "*** Error al consultar Categoria ***");
   }

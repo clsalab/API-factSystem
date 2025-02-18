@@ -2,12 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const mongooseDelete = require('mongoose-delete');
 
-// Definición del esquema
 const UsersScheme = new mongoose.Schema(
   {
     nombreCompleto: {
       type: String,
-      required: true
+      required: true,
     },
     correo: {
       type: String,
@@ -16,7 +15,7 @@ const UsersScheme = new mongoose.Schema(
     },
     idRol: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Rol',
+      ref: 'rols',
       required: true,
     },
     clave: {
@@ -35,19 +34,42 @@ const UsersScheme = new mongoose.Schema(
   }
 );
 
+// Método estático para obtener todos los usuarios con su rol
+UsersScheme.statics.findAllData = async function () {
+  try {
+    const joinData = await this.aggregate([
+      {
+        $lookup: {
+          from: 'rols',
+          localField: 'idRol',
+          foreignField: '_id',
+          as: 'rol',
+        },
+      },
+      {
+        $unwind: '$rol',
+      },
+      {
+        $project: {  // Asegúrate de excluir la clave
+          clave: 0,  // Excluir el campo 'clave' del resultado
+        },
+      }
+    ]);
+    return joinData;
+  } catch (error) {
+    console.error('Error en el uso de aggregate:', error);
+    throw error;
+  }
+};
+
 // Agregar el hook para encriptar la contraseña antes de guardar
 UsersScheme.pre('save', async function (next) {
   const user = this;
-
-  // Si la contraseña no se modificó, no hace falta encriptar de nuevo
   if (!user.isModified('clave')) return next();
 
   try {
-    // Encriptar la contraseña con bcrypt
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(user.clave, salt);
-
-    // Asignar la contraseña encriptada al campo 'clave'
     user.clave = hashedPassword;
     next();
   } catch (error) {
@@ -61,4 +83,5 @@ UsersScheme.plugin(mongooseDelete, { overrideMethods: 'all' });
 // Crear el modelo
 const UsersModel = mongoose.model('Usuarios', UsersScheme);
 
+// Exportar el modelo
 module.exports = UsersModel;

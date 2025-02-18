@@ -12,7 +12,6 @@ const RolSchema = new mongoose.Schema({
 });
 RolSchema.plugin(mongooseDelete, { overrideMethods: 'all', deletedAt: true });
 
-// Verificar si el modelo ya está definido antes de crearlo
-const RolModel = mongoose.models.Rol || mongoose.model('Rol', RolSchema);
+const RolModel = mongoose.models.Rol || mongoose.model('Rol', RolSchema );
 
 module.exports = RolModel;

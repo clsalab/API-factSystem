@@ -9,7 +9,7 @@ const getItems = async (req, res) => {
     const data = await MenuRolModel.find({});  // Aquí usamos la función find
     res.send({ data });
   } catch (error) {
-    handleHttpError(res, "*** Error al consultar Categoria ***");
+    handleHttpError(res, "*** Error al consultar MenuRol ***");
   }
 };
 
@@ -17,11 +17,11 @@ const getItem = async (req, res) => {
 
   try {
 
-    const data = await MenuRolModel.findById(req.params.id); // Busca la categoría por ID
-    if (!data) return res.status(404).send({ message: 'Categoría no encontrada' });
+    const data = await MenuRolModel.findById(req.params.id); // Busca la MenuRol por ID
+    if (!data) return res.status(404).send({ message: 'MenuRol no encontrado' });
     res.send({ data });
   } catch (error) {
-    handleHttpError(res, "*** Error al consultar Categoría ***");
+    handleHttpError(res, "*** Error al consultar MenuRol ***");
   }
 
 };
@@ -34,8 +34,8 @@ const createItem = async (req, res) => {
   console.log(body); // Verifica que el cuerpo esté llegando correctamente
 
   try {
-    const data = await MenuRolModel.create(body); // Crea la categoría en la base de datos
-    res.status(201).send({ message: 'Categoría creada con éxito', data: data });
+    const data = await MenuRolModel.create(body); // Crea la MenuRol en la base de datos
+    res.status(201).send({ message: 'MenuRol creado con éxito', data: data });
   } catch (error) {
     handleHttpError(res, "*** Error create Items ***");
   }
@@ -53,24 +53,24 @@ const updateItem = async (req, res) => {
 
 
 
-    // Actualizar la categoría
+    // Actualizar la MenuRol
     const data = await MenuRolModel.findOneAndUpdate(
       { _id: id },  // Buscar por ID
       body,
-      { new: true } // Retorna la categoría actualizada
+      { new: true } // Retorna la MenuRol actualizada
     );
 
-    // Verificar si la categoría existe
+    // Verificar si la MenuRol existe
     if (!data) {
-      return res.status(404).json({ message: "Categoría no encontrada" });
+      return res.status(404).json({ message: "MenuRol no encontrado" });
     }
 
-    res.status(200).json({ message: "Categoría actualizada con éxito", data });
+    res.status(200).json({ message: "MenuRol actualizado con éxito", data });
 
   } catch (e) {
     console.error("❌ Error en la actualización:", e);
 
-    handleHttpError(res, "*** Error al actualizar Categoría ***");
+    handleHttpError(res, "*** Error al actualizar MenuRol ***");
   }
 };
 
@@ -87,13 +87,13 @@ const deleteItem = async (req, res) => {
     const data = await MenuRolModel.delete({ _id: id });
 
     if (!data) {
-      return res.status(404).json({ message: "❌ Categoría no encontrada" });
+      return res.status(404).json({ message: "❌ MenuRol no encontrado" });
     }
 
-    res.status(200).json({ message: "✅ Categoría eliminada correctamente (soft delete)", data });
+    res.status(200).json({ message: "✅ MenuRol eliminado correctamente (soft delete)", data });
 
   } catch (e) {
-    console.error("❌ Error al eliminar categoría:", e);
+    console.error("❌ Error al eliminar MenuRol:", e);
     res.status(500).json({ error: e.message });
   }
 };

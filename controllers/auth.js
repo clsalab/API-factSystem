@@ -50,6 +50,10 @@ const login = async (req, res) => {
 const registerUser = async (req, res) => {
   try {
     const cleanData = matchedData(req); // Filtra los datos correctamente
+    const existingUser = await UsersModel.findOne({ correo: cleanData.correo });
+    if (existingUser) {
+      return res.status(400).json({ message: "El correo ya está registrado." });
+    }
 
     const dataUser = await UsersModel.create(cleanData); // Crea el usuario (la contraseña se encripta automáticamente)
     dataUser.set('clave', undefined, {strict:false}); //

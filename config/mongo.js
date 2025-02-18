@@ -6,6 +6,7 @@ const dbConnect = async () => {
   try {
     await mongoose.connect(DB_URI); // Sin las opciones obsoletas
     console.log('****CONEXION A LA DB MONGO****');
+
   } catch (err) {
     console.error(`****ERROR DE CONEXION DB MONGO: ${err.message}****`);
     process.exit(1);

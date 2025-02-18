@@ -1,8 +1,8 @@
-const handleHttpError = (res, message = "Algo salió mal", code = 500) => {
-  res.status(code).json({ error: message });
+// utils/handleError.js
+const handleHttpError = (res, message, statusCode = 500) => {
+  res.status(statusCode).json({
+    error: message,
+  });
 };
 
-module.exports = handleHttpError;
-
-
-
+module.exports = { handleHttpError };
