@@ -1,14 +1,15 @@
 const express = require('express');
-const { getItems, getItem, createItem,  deleteItem } = require('../controllers/ventas');
+const { getItems, getItem, createItem, updateItem, deleteItem } = require('../controllers/ventas');
 const { validatorCreateItem, validatorGetItem } = require('../validators/ventas');
 const router = express.Router();
 
 // Crud
 
 router.get('/', getItems);
-router.get('/', getItem);
+router.get('/:id',validatorGetItem, getItem);
 router.post('/',validatorCreateItem, createItem);
-router.delete('/', deleteItem);
+router.put('/:id',validatorGetItem, updateItem);
+router.delete('/id',validatorGetItem, deleteItem);
 
 
 module.exports = router

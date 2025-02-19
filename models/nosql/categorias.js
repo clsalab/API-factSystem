@@ -19,6 +19,7 @@ const CategoriasScheme = new mongoose.Schema(
   }
 );
 
+
 CategoriasScheme.plugin(mongooseDelete, { overrideMethods: 'all', deletedAt: true });
 const CategoriasModel = mongoose.model('Categorias', CategoriasScheme);
 

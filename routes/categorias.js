@@ -5,15 +5,12 @@ const authMiddleware = require('../middleware/sesion');
 const cherolRol = require('../middleware/rol');
 const router = express.Router();
 
-// Crud
+// CRUD para categorías
 
-// Rutas para las categorías
-router.get('/',authMiddleware, getItems);
-router.get('/:id',validatorGetItem, getItem); // Resto de la ruta para obtener un solo item
-router.post('/', authMiddleware,cherolRol("admin"), validatorCreateItem, createItem);
-router.put('/:id',validatorGetItem, validatorCreateItem, updateItem);
-router.delete('/:id',validatorGetItem, deleteItem);
+router.get('/', authMiddleware,cherolRol(["admin", "user"]), getItems);  // Middleware de autenticación
+router.get('/:id', authMiddleware, validatorGetItem, getItem);  // Obtener un solo item
+router.post('/', authMiddleware, cherolRol("admin"), validatorCreateItem, createItem);  // Solo 'admin' puede crear
+router.put('/:id', validatorGetItem, validatorCreateItem, updateItem);  // Actualizar una categoría
+router.delete('/:id', validatorGetItem, deleteItem);  // Eliminar una categoría
 
-
-
-module.exports = router
+module.exports = router;

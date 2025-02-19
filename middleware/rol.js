@@ -1,10 +1,10 @@
 const { handleHttpError } = require('../utils/handleError');
-const { UsersModel } = require('../models');  // Asegúrate de que este modelo esté bien importado
+const { RolModel } = require('../models');  // Asegúrate de que este modelo esté bien importado
 
 // Middleware para verificar rol
-const cherolRol = (requiredRole) => async (req, res, next) => {
+const cherolRol = (requiredRoles) => async (req, res, next) => {
   try {
-    const user = req.user;
+    const user = req.user;  // Obtén el usuario desde la request (presumiblemente lo asignaste desde el middleware de autenticación)
 
     // Asegurarse de que el usuario esté definido
     if (!user) {
@@ -12,15 +12,14 @@ const cherolRol = (requiredRole) => async (req, res, next) => {
     }
 
     // Usar populate para obtener los detalles del rol
-    await user.populate('idRol');  // Eliminamos execPopulate y solo usamos populate ahora
+    await user.populate({
+      path: 'idRol',  // Este campo debe estar correctamente referenciado
+      model: RolModel,  // El modelo de Rol que estás utilizando
+      select: 'nombre'  // Solo seleccionamos el campo 'nombre' del rol
+    });
 
-    // Imprimir el objeto user y su rol para depuración
-    console.log("User after populate:", user);
-    console.log("User role:", user.idRol);
-
-    // Verifica si el nombre del rol coincide con el rol requerido
-    // Suponiendo que el rol tiene un campo 'nombre' (ajústalo si es necesario)
-    if (user.idRol.nombre !== requiredRole) {
+    // Verifica si el nombre del rol está en el array de roles requeridos
+    if (!requiredRoles.includes(user.idRol.nombre)) {
       return res.status(403).json({ message: 'Acceso denegado. Rol insuficiente.' });
     }
 
@@ -28,7 +27,7 @@ const cherolRol = (requiredRole) => async (req, res, next) => {
     next();
 
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error al verificar rol:", error);
     handleHttpError(res, "*** Error al verificar rol ***", 500);
   }
 }

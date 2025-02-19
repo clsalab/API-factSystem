@@ -10,8 +10,8 @@ const tokenSign = async (user) => {
   const sign = jwt.sign(
     {
       id: user._id,
-      username: user.nombreCompleto,
-      roles: user.idRol,
+      nombreCompleto: user.nombreCompleto,
+      rol: user.idRol,
     },
     JWT_SECRET,
     { expiresIn: '1h' }  // Aquí se maneja la expiración directamente

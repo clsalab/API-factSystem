@@ -33,6 +33,7 @@ const authMiddleware = async (req, res, next) => {
 
     // Aquí estaba el error: el bloque estaba cerrado antes de tiempo
     const user = await UsersModel.findById(dataToken.id);
+     // Eliminamos execPopulate y solo usamos populate ahora
     req.user = user;
 
     // Si todo es correcto, continuamos con la siguiente capa

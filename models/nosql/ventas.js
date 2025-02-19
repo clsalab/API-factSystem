@@ -1,22 +1,21 @@
 const mongoose = require('mongoose');
 const mongooseDelete = require('mongoose-delete');
 
-const VentasScheme = new mongoose.Schema(
+const VentasSchema = new mongoose.Schema(
   {
     numeroDocumento: {
       type: String,
-      required: true
+      required: true,
     },
     tipoPago: {
-      type: ["Credito", "SemiCredito","Efectivo"],
-      default: "Efectivo",
-
+      type: String,
+      enum: ["Credito", "SemiCredito", "Efectivo"],  // Usar enum para restringir los valores posibles
+      default: "Efectivo",  // Valor por defecto si no se especifica
     },
     total: {
       type: Number,
-      required: true
+      required: true,
     },
-
   },
   {
     timestamps: true,
@@ -24,7 +23,10 @@ const VentasScheme = new mongoose.Schema(
   }
 );
 
-VentasScheme.plugin(mongooseDelete, { overrideMethods: 'all', deletedAt: true });
-const VentasModel = mongoose.model('Ventas', VentasScheme);
+// Plugin para el soft delete
+VentasSchema.plugin(mongooseDelete, { overrideMethods: 'all', deletedAt: true });
+
+// Crear el modelo para Ventas
+const VentasModel = mongoose.models.Ventas || mongoose.model('Ventas', VentasSchema);
 
 module.exports = VentasModel;

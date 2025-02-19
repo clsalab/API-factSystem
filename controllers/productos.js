@@ -6,7 +6,7 @@ const { ProductosModel }  = require('../models');
 const getItems = async (req, res) => {
   try {
 
-    const data = await ProductosModel.find({});  // Aquí usamos la función find
+    const data = await ProductosModel.findAllData({});  // Aquí usamos la función find
     res.send({ data });
   } catch (error) {
     handleHttpError(res, "*** Error al consultar Productos ***");
@@ -17,7 +17,7 @@ const getItem = async (req, res) => {
 
   try {
 
-    const data = await ProductosModel.findById(req.params.id); // Busca la Productos por ID
+    const data = await ProductosModel.findOneData(req.params.id); // Busca la Productos por ID
     if (!data) return res.status(404).send({ message: 'Productos no encontrado' });
     res.send({ data });
   } catch (error) {

@@ -6,7 +6,7 @@ const { MenuRolModel }  = require('../models');
 const getItems = async (req, res) => {
   try {
 
-    const data = await MenuRolModel.find({});  // Aquí usamos la función find
+    const data = await MenuRolModel.findAllData();  // Aquí usamos la función find
     res.send({ data });
   } catch (error) {
     handleHttpError(res, "*** Error al consultar MenuRol ***");
@@ -17,7 +17,7 @@ const getItem = async (req, res) => {
 
   try {
 
-    const data = await MenuRolModel.findById(req.params.id); // Busca la MenuRol por ID
+    const data = await MenuRolModel.findOneData(req.params.id); // Busca la MenuRol por ID
     if (!data) return res.status(404).send({ message: 'MenuRol no encontrado' });
     res.send({ data });
   } catch (error) {

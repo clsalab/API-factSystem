@@ -98,7 +98,64 @@ const deleteItem = async (req, res) => {
   }
 };
 
+const incrementarNumero = async (req, res) => {
+  try {
+    const documento = await NumeroDocumentoModel.findOne();
+    if (documento) {
+      // Si existe el documento, incrementar el número
+      documento.ultimoNumero += 1;
+      await documento.save();
+      res.status(200).json({ message: 'Número incrementado correctamente', data: documento });
+    } else {
+      // Si no existe, crear un nuevo documento
+      const nuevoDocumento = new NumeroDocumentoModel({ ultimoNumero: 1 });
+      await nuevoDocumento.save();
+      res.status(201).json({ message: 'Nuevo número creado', data: nuevoDocumento });
+    }
+  } catch (error) {
+    console.error('Error al incrementar el número:', error);
+    res.status(500).json({ message: 'Error al incrementar el número', error });
+  }
+};
+
+// Función para eliminar un número (soft delete)
+const eliminarNumeroDocumento = async (req, res) => {
+  try {
+    const { id } = req.params;  // Suponiendo que pasas el ID como parámetro en la URL
+    const documento = await NumeroDocumentoModel.findById(id);
+    if (documento) {
+      await documento.delete(); // Marca el documento como eliminado
+      res.status(200).json({ message: 'Número eliminado correctamente' });
+    } else {
+      res.status(404).json({ message: 'Documento no encontrado' });
+    }
+  } catch (error) {
+    console.error('Error al eliminar el número:', error);
+    res.status(500).json({ message: 'Error al eliminar el número', error });
+  }
+};
+
+// Función para restaurar un número eliminado
+const restaurarNumeroDocumento = async (req, res) => {
+  try {
+    const { id } = req.params; // El ID del documento que quieres restaurar
+    const documentoEliminado = await NumeroDocumentoModel.restore({ _id: id });
+    if (documentoEliminado) {
+      res.status(200).json({ message: 'Número restaurado correctamente' });
+    } else {
+      res.status(404).json({ message: 'Documento no encontrado o no eliminado' });
+    }
+  } catch (error) {
+    console.error('Error al restaurar el número:', error);
+    res.status(500).json({ message: 'Error al restaurar el número', error });
+  }
+};
 
 
 
-module.exports = { getItems, getItem, createItem, updateItem, deleteItem};
+
+module.exports = { getItems, getItem, createItem, updateItem, deleteItem,
+  incrementarNumero,
+  eliminarNumeroDocumento,
+  restaurarNumeroDocumento,
+};

@@ -5,21 +5,23 @@ const { DetallesVentasModel }  = require('../models');
 
 const getItems = async (req, res) => {
   try {
+    const user = req.user
+    const data = await DetallesVentasModel.findAllData();  // Aquí usamos la función find
+    console.log('Datos obtenidos:', data); // Log para verificar la respuesta
 
-    const data = await DetallesVentasModel.find({});  // Aquí usamos la función find
-    res.send({ data });
+    res.send({ data, user });
   } catch (error) {
-    handleHttpError(res, "*** Error al consultar Detalles Ventas ***");
+    handleHttpError(res, "*** Error al consultar Detalles Ventas ***", 500);
   }
 };
 
 const getItem = async (req, res) => {
 
   try {
-
-    const data = await DetallesVentasModel.findById(req.params.id); // Busca la Detalles Ventas por ID
+    const user = req.user
+    const data = await DetallesVentasModel.findOneData(req.params.id); // Busca la Detalles Ventas por ID
     if (!data) return res.status(404).send({ message: 'Detalles Ventas no encontrado' });
-    res.send({ data });
+    res.send({ data, user });
   } catch (error) {
     handleHttpError(res, "*** Error al consultar Detalles Ventas ***");
   }

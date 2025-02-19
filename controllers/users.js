@@ -19,17 +19,25 @@ const getItems = async (req, res) => {
 
 
 const getItem = async (req, res) => {
-
   try {
+    const id = req.params.id;
+    console.log('ID recibido para buscar:', id);  // Agrega este log para verificar el ID recibido
 
-    const data = await UsersModel.findById(req.params.id); // Busca la Users por ID
-    if (!data) return res.status(404).send({ message: 'Users no encontrado' });
+    const data = await UsersModel.findOneData(id); // Busca el usuario por ID
+
+    if (!data) {
+      return res.status(404).send({ message: 'Usuario no encontrado' });
+    }
+
     res.send({ data });
   } catch (error) {
-    handleHttpError(res, "*** Error al consultar Users ***", 500);
+    console.error('Error al consultar Usuario:', error);
+    handleHttpError(res, "*** Error al consultar Usuario ***", 500);
   }
-
 };
+
+
+
 
 
 const createItem = async (req, res) => {
