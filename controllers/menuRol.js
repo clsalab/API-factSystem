@@ -1,104 +1,100 @@
 const mongoose = require('mongoose');
 const { matchedData } = require('express-validator');
 const handleHttpError = require('../utils/handleError');
-const { MenuRolModel }  = require('../models');
+const { MenuRolModel } = require('../models');
 
 const getItems = async (req, res) => {
   try {
+    const user = req.user;  // Obtén el usuario autenticado
+    console.log(`Usuario autenticado: ${user.id}`);  // Puedes usar esto para auditoría
 
-    const data = await MenuRolModel.findAllData();  // Aquí usamos la función find
-    res.send({ data });
+    const data = await MenuRolModel.findAllData();
+    res.send({ data, user });  // Devolver los datos junto con el usuario
   } catch (error) {
     handleHttpError(res, "*** Error al consultar MenuRol ***");
   }
 };
 
 const getItem = async (req, res) => {
-
   try {
+    const user = req.user;  // Obtén el usuario autenticado
+    console.log(`Usuario autenticado: ${user.id}`);
 
     const data = await MenuRolModel.findOneData(req.params.id); // Busca la MenuRol por ID
     if (!data) return res.status(404).send({ message: 'MenuRol no encontrado' });
-    res.send({ data });
+
+    res.send({ data, user });  // Devolver los datos junto con el usuario
   } catch (error) {
     handleHttpError(res, "*** Error al consultar MenuRol ***");
   }
-
 };
 
-
 const createItem = async (req, res) => {
-
-  const body = matchedData(req)
+  const body = matchedData(req);
+  const user = req.user;  // Obtén el usuario autenticado
+  console.log(`Usuario autenticado: ${user.id}`);
 
   console.log(body); // Verifica que el cuerpo esté llegando correctamente
 
   try {
-    const data = await MenuRolModel.create(body); // Crea la MenuRol en la base de datos
-    res.status(201).send({ message: 'MenuRol creado con éxito', data: data });
+    const data = await MenuRolModel.create({
+      ...body,
+      createdBy: user.id,  // Asocia el usuario que crea el ítem
+    });
+
+    res.status(201).send({ message: 'MenuRol creado con éxito', data, user });  // Devolver los datos junto con el usuario
   } catch (error) {
-    handleHttpError(res, "*** Error create Items ***");
+    handleHttpError(res, "*** Error al crear MenuRol ***");
   }
 };
 
-
 const updateItem = async (req, res) => {
   try {
-    // Obtener ID de la URL y datos del body
-    const { id } = req.params; // Tomar el ID desde la URL
-    const body = req.body; // Tomar los datos a actualizar
+    const { id } = req.params;
+    const body = req.body;
+    const user = req.user;  // Obtén el usuario autenticado
 
     console.log("📌 ID recibido:", id);
     console.log("📌 Datos a actualizar:", body);
+    console.log(`Usuario autenticado: ${user.id}`);
 
-
-
-    // Actualizar la MenuRol
     const data = await MenuRolModel.findOneAndUpdate(
       { _id: id },  // Buscar por ID
-      body,
-      { new: true } // Retorna la MenuRol actualizada
+      {
+        ...body,
+        updatedBy: user.id,  // Asocia el usuario que actualiza el ítem
+      },
+      { new: true }
     );
 
-    // Verificar si la MenuRol existe
     if (!data) {
       return res.status(404).json({ message: "MenuRol no encontrado" });
     }
 
-    res.status(200).json({ message: "MenuRol actualizado con éxito", data });
-
+    res.status(200).json({ message: "MenuRol actualizado con éxito", data, user });  // Devolver los datos junto con el usuario
   } catch (e) {
     console.error("❌ Error en la actualización:", e);
-
     handleHttpError(res, "*** Error al actualizar MenuRol ***");
   }
 };
 
-
-
-
 const deleteItem = async (req, res) => {
   try {
-    // Obtener el ID desde la URL
     const { id } = req.params;
-    console.log("📌 ID recibido para eliminar:", id);
+    const user = req.user;  // Obtén el usuario autenticado
 
-    // Buscar y marcar como eliminado (soft delete)
+    // Eliminar el item de manera "soft delete" y asociar al usuario que lo elimina
     const data = await MenuRolModel.delete({ _id: id });
 
     if (!data) {
       return res.status(404).json({ message: "❌ MenuRol no encontrado" });
     }
 
-    res.status(200).json({ message: "✅ MenuRol eliminado correctamente (soft delete)", data });
-
+    res.status(200).json({ message: "✅ MenuRol eliminado correctamente (soft delete)", data, user });  // Devolver los datos junto con el usuario
   } catch (e) {
     console.error("❌ Error al eliminar MenuRol:", e);
     res.status(500).json({ error: e.message });
   }
 };
 
-
-
-
-module.exports = { getItems, getItem, createItem, updateItem, deleteItem};
+module.exports = { getItems, getItem, createItem, updateItem, deleteItem };

@@ -33,15 +33,20 @@ ProductosSchema.statics.findAllData = async function () {
   try {
     const joinData = await this.aggregate([
       {
+        $match: {
+          deleted: { $ne: true }  // Filtra para no mostrar los elementos eliminados (soft delete)
+        },
+      },
+      {
         $lookup: {
-          from: 'categorias', // Nombre de la colección de categorías
+          from: 'categorias',  // Nombre de la colección de categorías
           localField: 'idCategoria',
           foreignField: '_id',
           as: 'categoria',
         },
       },
       {
-        $unwind: '$categoria', // Desenrolla el array de categorías
+        $unwind: '$categoria',  // Desenrolla el array de categorías
       },
       {
         $project: {
@@ -57,6 +62,7 @@ ProductosSchema.statics.findAllData = async function () {
   }
 };
 
+
 // Método estático para obtener un producto por ID con su categoría
 ProductosSchema.statics.findOneData = async function (id) {
   try {
@@ -64,6 +70,7 @@ ProductosSchema.statics.findOneData = async function (id) {
       {
         $match: {
           _id: new mongoose.Types.ObjectId(id),  // Buscar el producto por su ID
+          deleted: { $ne: true }
         },
       },
       {

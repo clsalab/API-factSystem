@@ -1,5 +1,5 @@
 // middleware/sesion.js
-const { handleHttpError } = require('../utils/handleError'); // Asegúrate de que la importación esté correcta
+const { handleHttpError } = require('../utils/handleError');
 const { tokenVerify } = require('../utils/handleJwt');
 const { UsersModel } = require('../models');
 
@@ -23,7 +23,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     // Verifica el token usando tokenVerify
-    const dataToken = await tokenVerify(token);
+    const dataToken = await tokenVerify(token, process.env.JWT_SECRET);
     console.log("Token decodificado:", dataToken);  // Verifica el contenido del token decodificado
 
     if (!dataToken || !dataToken.id) {
@@ -31,9 +31,14 @@ const authMiddleware = async (req, res, next) => {
       return;
     }
 
-    // Aquí estaba el error: el bloque estaba cerrado antes de tiempo
-    const user = await UsersModel.findById(dataToken.id);
-     // Eliminamos execPopulate y solo usamos populate ahora
+    // Buscar al usuario y usar populate para obtener el rol
+    const user = await UsersModel.findById(dataToken.id).populate('idRol', 'nombre'); // Aquí se usa populate
+    if (!user) {
+      handleHttpError(res, "*** Usuario no encontrado ***", 404);
+      return;
+    }
+
+    // Añadir el usuario al objeto request para que esté disponible en las siguientes capas
     req.user = user;
 
     // Si todo es correcto, continuamos con la siguiente capa

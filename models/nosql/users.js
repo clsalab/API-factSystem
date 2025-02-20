@@ -17,7 +17,7 @@ const UsersScheme = new mongoose.Schema(
     },
     idRol: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'rols',
+      ref: 'Rol',
       required: true,
       index: true,  // Agregado índice
     },

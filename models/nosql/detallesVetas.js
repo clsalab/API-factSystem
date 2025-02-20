@@ -37,6 +37,8 @@ const DetallesVentasScheme = new mongoose.Schema(
 // Método estático para obtener todos los detalles de ventas con los datos de Ventas, Productos y Categoria
 DetallesVentasScheme.statics.findAllData = async function () {
   try {
+    console.log("Ejecutando la agregación para obtener los detalles de ventas...");
+
     const joinData = await this.aggregate([
       {
         $lookup: {
@@ -47,7 +49,10 @@ DetallesVentasScheme.statics.findAllData = async function () {
         },
       },
       {
-        $unwind: '$venta',  // Desenrolla la relación de ventas
+        $unwind: {
+          path: '$venta',
+          preserveNullAndEmptyArrays: true,  // Si no hay relación, lo preserva vacío
+        },
       },
       {
         $lookup: {
@@ -58,18 +63,24 @@ DetallesVentasScheme.statics.findAllData = async function () {
         },
       },
       {
-        $unwind: '$producto',  // Desenrolla la relación de productos
+        $unwind: {
+          path: '$producto',
+          preserveNullAndEmptyArrays: true,  // Si no hay relación, lo preserva vacío
+        },
       },
       {
         $lookup: {
           from: 'categorias',  // Nombre de la colección de categorías
-          localField: 'producto.idCategoria',  // El campo idCategoria dentro del objeto producto
+          localField: 'producto.idCategoria',  // Relación con 'idCategoria' de productos
           foreignField: '_id',
-          as: 'categoria',  // El nombre del campo que contendrá los datos de la categoría
+          as: 'categoria',
         },
       },
       {
-        $unwind: '$categoria',  // Desenrolla la relación de categorías
+        $unwind: {
+          path: '$categoria',
+          preserveNullAndEmptyArrays: true,  // Si no hay relación, lo preserva vacío
+        },
       },
       {
         $project: {  // Excluir campos no deseados si es necesario
@@ -77,6 +88,13 @@ DetallesVentasScheme.statics.findAllData = async function () {
         },
       },
     ]);
+
+    console.log("Datos obtenidos con la agregación:", joinData);
+
+    if (!joinData || joinData.length === 0) {
+      console.log('No se encontraron detalles de ventas.');
+    }
+
     return joinData;
   } catch (error) {
     console.error('Error en el uso de aggregate:', error);
@@ -84,12 +102,16 @@ DetallesVentasScheme.statics.findAllData = async function () {
   }
 };
 
-// Método estático para obtener un detalle de venta por ID con los datos de Ventas, Productos y Categoria
 DetallesVentasScheme.statics.findOneData = async function (id) {
   try {
+    console.log(`Buscando detalles de venta con el ID: ${id}...`);
+
+    // Realiza la agregación para buscar los detalles de venta
     const joinData = await this.aggregate([
       {
-        $match: { _id: new mongoose.Types.ObjectId(id) },  // Buscar por el ID del detalle de venta
+        $match: {  // Filtro por ID
+          _id: new mongoose.Types.ObjectId(id)  // Convierte el id a ObjectId si es necesario
+        },
       },
       {
         $lookup: {
@@ -100,7 +122,10 @@ DetallesVentasScheme.statics.findOneData = async function (id) {
         },
       },
       {
-        $unwind: '$venta',  // Desenrolla la relación de ventas
+        $unwind: {
+          path: '$venta',
+          preserveNullAndEmptyArrays: true,  // Si no hay relación, lo preserva vacío
+        },
       },
       {
         $lookup: {
@@ -111,18 +136,24 @@ DetallesVentasScheme.statics.findOneData = async function (id) {
         },
       },
       {
-        $unwind: '$producto',  // Desenrolla la relación de productos
+        $unwind: {
+          path: '$producto',
+          preserveNullAndEmptyArrays: true,  // Si no hay relación, lo preserva vacío
+        },
       },
       {
         $lookup: {
           from: 'categorias',  // Nombre de la colección de categorías
-          localField: 'producto.idCategoria',  // El campo idCategoria dentro del objeto producto
+          localField: 'producto.idCategoria',  // Relación con 'idCategoria' de productos
           foreignField: '_id',
-          as: 'categoria',  // El nombre del campo que contendrá los datos de la categoría
+          as: 'categoria',
         },
       },
       {
-        $unwind: '$categoria',  // Desenrolla la relación de categorías
+        $unwind: {
+          path: '$categoria',
+          preserveNullAndEmptyArrays: true,  // Si no hay relación, lo preserva vacío
+        },
       },
       {
         $project: {  // Excluir campos no deseados si es necesario
@@ -131,17 +162,21 @@ DetallesVentasScheme.statics.findOneData = async function (id) {
       },
     ]);
 
-    // Si el array está vacío, significa que no se encontró el detalle
-    if (joinData.length === 0) {
-      return null;  // Si no se encuentra el detalle, devuelve null
+    // Verificar si se encontraron resultados
+    if (!joinData || joinData.length === 0) {
+      console.log(`No se encontraron detalles de ventas para el ID: ${id}`);
+      return null;  // Si no se encuentra el detalle de ventas, devuelve null
     }
 
-    return joinData[0];  // Retorna el primer resultado
+    return joinData;
   } catch (error) {
-    console.error('Error al ejecutar aggregate:', error);
-    throw error;  // Lanza el error para ser manejado en el controlador
+    console.error('Error en el uso de aggregate:', error);
+    throw error;
   }
 };
+
+
+
 
 // Plugin para el soft delete
 DetallesVentasScheme.plugin(mongooseDelete, { overrideMethods: 'all', deletedAt: true });

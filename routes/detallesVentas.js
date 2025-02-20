@@ -1,17 +1,25 @@
 const express = require('express');
-const { getItems, getItem, createItem,  deleteItem, updateItem } = require('../controllers/detallesVentas');
+const { getItems, getItem, createItem, updateItem, deleteItem } = require('../controllers/detallesVentas');
 const { validatorCreateItem, validatorGetItem } = require('../validators/detallesVentas');
 const authMiddleware = require('../middleware/sesion');
 const cherolRol = require('../middleware/rol');
 const router = express.Router();
 
-// Crud
+// CRUD para detalles de ventas
 
-router.get('/', authMiddleware,cherolRol(["admin", "user", "vendedor"]), getItems);
-router.get('/:id',validatorGetItem, getItem); // Resto de la ruta para obtener un solo item
-router.post('/', validatorCreateItem, createItem);
-router.put('/:id',validatorGetItem, validatorCreateItem, updateItem);
-router.delete('/:id',validatorGetItem, deleteItem);
+// Obtener todos los detalles de ventas - Solo accesible para admin, user, y vendedor
+router.get('/', authMiddleware, cherolRol(["admin", "user", "vendedor"]), getItems);
 
+// Obtener un detalle de venta específico por ID
+router.get('/:id', authMiddleware, validatorGetItem, getItem);  // Agregar el middleware de validación
 
-module.exports = router
+// Crear un nuevo detalle de venta - Solo accesible para admin
+router.post('/', authMiddleware, cherolRol("admin"), validatorCreateItem, createItem);
+
+// Actualizar un detalle de venta - Accesible solo para admin
+router.put('/:id', authMiddleware, validatorGetItem, validatorCreateItem, updateItem);
+
+// Eliminar un detalle de venta - Accesible solo para admin
+router.delete('/:id', authMiddleware, cherolRol("admin"), validatorGetItem, deleteItem);
+
+module.exports = router;

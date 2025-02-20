@@ -7,10 +7,10 @@ const router = express.Router();
 
 // CRUD para categorías
 
-router.get('/', authMiddleware,cherolRol(["admin", "user"]), getItems);  // Middleware de autenticación
+router.get('/', authMiddleware,cherolRol(["admin", "user", "vendedor"]), getItems);  // Middleware de autenticación
 router.get('/:id', authMiddleware, validatorGetItem, getItem);  // Obtener un solo item
-router.post('/', authMiddleware, cherolRol("admin"), validatorCreateItem, createItem);  // Solo 'admin' puede crear
-router.put('/:id', validatorGetItem, validatorCreateItem, updateItem);  // Actualizar una categoría
-router.delete('/:id', validatorGetItem, deleteItem);  // Eliminar una categoría
+router.post('/', authMiddleware, cherolRol(["admin", "vendedor"]), validatorCreateItem, createItem);  // Solo 'admin' puede crear
+router.put('/:id',authMiddleware, validatorGetItem, validatorCreateItem, updateItem);  // Actualizar una categoría
+router.delete('/:id',authMiddleware, cherolRol(["admin", "user", "vendedor"]), validatorGetItem, deleteItem);  // Eliminar una categoría
 
 module.exports = router;
