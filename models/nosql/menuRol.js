@@ -25,6 +25,11 @@ MenuRolScheme.statics.findAllData = async function () {
   try {
     const joinData = await this.aggregate([
       {
+        $match: {
+          deleted: { $ne: true }
+        },
+      },
+      {
         $lookup: {
           from: 'menus', // Nombre de la colección de menús
           localField: 'idMenu',
@@ -70,6 +75,7 @@ MenuRolScheme.statics.findOneData = async function (id) {
       {
         $match: {
           _id: new mongoose.Types.ObjectId(id),  // Buscar por el ID de MenuRol
+          deleted: { $ne: true }
         },
       },
       {

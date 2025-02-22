@@ -41,6 +41,11 @@ DetallesVentasScheme.statics.findAllData = async function () {
 
     const joinData = await this.aggregate([
       {
+        $match: {
+          deleted: { $ne: true }
+        },
+      },
+      {
         $lookup: {
           from: 'ventas',  // Nombre de la colección de ventas
           localField: 'idVentas',
@@ -110,7 +115,8 @@ DetallesVentasScheme.statics.findOneData = async function (id) {
     const joinData = await this.aggregate([
       {
         $match: {  // Filtro por ID
-          _id: new mongoose.Types.ObjectId(id)  // Convierte el id a ObjectId si es necesario
+          _id: new mongoose.Types.ObjectId(id),  // Convierte el id a ObjectId si es necesario
+          deleted: { $ne: true }
         },
       },
       {

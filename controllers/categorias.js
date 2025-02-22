@@ -83,7 +83,7 @@ const deleteItem = async (req, res) => {
     const { id } = req.params;
 
     // Eliminar la categoría
-    const data = await CategoriasModel.deleteOne({ _id: id });
+    const data = await CategoriasModel.delete({ _id: id });
     if (!data) {
       return res.status(404).json({ message: "Categoría no encontrada" });
     }
