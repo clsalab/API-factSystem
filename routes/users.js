@@ -8,7 +8,7 @@ const router = express.Router();
 // CRUD para usuarios
 
 // Obtener todos los usuarios - Solo accesible para admins
-router.get('/', authMiddleware, cherolRol("admin"), getItems);
+router.get('/', authMiddleware, cherolRol(["admin","user"]), getItems);
 
 // Obtener un solo usuario - Accesible para usuarios autenticados
 router.get('/:id', authMiddleware, validatorGetItem, getItem);
