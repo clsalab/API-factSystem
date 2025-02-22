@@ -1,5 +1,5 @@
 const { handleHttpError } = require('../utils/handleError');
-const { RolModel, MenuRolModel, MenuModel  } = require('../models');  // Asegúrate de que este modelo esté bien importado
+const { RolModel  } = require('../models');  // Asegúrate de que este modelo esté bien importado
 
 // Middleware para verificar rol
 const cherolRol = (requiredRoles) => async (req, res, next) => {
