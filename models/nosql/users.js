@@ -19,12 +19,18 @@ const UsersScheme = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Rol',
       required: true,
-      index: true,  // Agregado índice
+      index: true,
+    },
+    idMenuRol: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'MenuRol',
+      required: true,
+      index: true,
     },
     clave: {
       type: String,
       required: true,
-      select: false,  // Esto asegura que la contraseña no se devuelva en las respuestas por defecto
+      select: false,
     },
     esActivo: {
       type: Boolean,
@@ -37,88 +43,209 @@ const UsersScheme = new mongoose.Schema(
   }
 );
 
-// Método estático para obtener todos los usuarios con su rol
+// Método estático para obtener todos los usuarios con su rol y menú
 UsersScheme.statics.findAllData = async function () {
   try {
     const joinData = await this.aggregate([
       {
-        $match: {
-          deleted: { $ne: true }
-        },
+        $match: { deleted: { $ne: true } },
       },
       {
         $lookup: {
-          from: 'rols',  // Nombre de la colección de roles
+          from: 'rols',
           localField: 'idRol',
           foreignField: '_id',
           as: 'rol',
         },
       },
       {
-        $unwind: '$rol',  // Solo un rol por usuario
+        $unwind: {
+          path: '$rol',
+          preserveNullAndEmptyArrays: true, // 🔹 Asegura que no se pierdan usuarios sin rol
+        },
       },
       {
-        $project: {  // Excluimos la contraseña
-          clave: 0,  // Excluir el campo 'clave' del resultado
+        $lookup: {
+          from: 'menurols',
+          localField: 'idMenuRol',
+          foreignField: '_id',
+          as: 'menuRol',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menuRol',
+          preserveNullAndEmptyArrays: true, // 🔹 Evita que se pierdan usuarios sin menú asignado
+        },
+      },
+      {
+        $lookup: {
+          from: 'menus',
+          localField: 'menuRol.idMenu',
+          foreignField: '_id',
+          as: 'menuRol.menu',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menuRol.menu',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'rols',
+          localField: 'menuRol.menu.idRol',
+          foreignField: '_id',
+          as: 'menuRol.menu.rol',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menuRol.menu.rol',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'rols',
+          localField: 'menuRol.idRol',
+          foreignField: '_id',
+          as: 'menuRol.rol',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menuRol.rol',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          clave: 0, // 🔹 Ocultamos la clave del usuario
+          'menuRol.idMenu': 0,
+          'menuRol.idRol': 0,
+          'menuRol.menu.idRol': 0,
         },
       },
     ]);
+
     return joinData;
   } catch (error) {
-    console.error('Error en el uso de aggregate:', error);
+    console.error('Error en findAllData:', error);
     throw error;
   }
 };
 
-// Método estático para obtener un solo usuario con su rol
+
+
+// Método para obtener un usuario con su rol y menú
 UsersScheme.statics.findOneData = async function (id) {
   try {
     const joinData = await this.aggregate([
       {
         $match: {
-          _id: new mongoose.Types.ObjectId(id),  // Aquí agregamos 'new' a ObjectId
-          deleted: { $ne: true }
+          _id: new mongoose.Types.ObjectId(id),
+          deleted: { $ne: true },
         },
       },
       {
         $lookup: {
-          from: 'rols',  // Asegúrate de que esta colección existe
+          from: 'rols',
           localField: 'idRol',
           foreignField: '_id',
           as: 'rol',
         },
       },
       {
-        $unwind: '$rol',  // Desenrolla el array para obtener el rol
+        $unwind: {
+          path: '$rol',
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
-        $project: {  // Excluir el campo 'clave'
-          clave: 0,
+        $lookup: {
+          from: 'menurols',
+          localField: 'idMenuRol',
+          foreignField: '_id',
+          as: 'menuRol',
         },
-      }
+      },
+      {
+        $unwind: {
+          path: '$menuRol',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'menus',
+          localField: 'menuRol.idMenu',
+          foreignField: '_id',
+          as: 'menuRol.menu',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menuRol.menu',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'rols',
+          localField: 'menuRol.menu.idRol',
+          foreignField: '_id',
+          as: 'menuRol.menu.rol',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menuRol.menu.rol',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'rols',
+          localField: 'menuRol.idRol',
+          foreignField: '_id',
+          as: 'menuRol.rol',
+        },
+      },
+      {
+        $unwind: {
+          path: '$menuRol.rol',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          clave: 0,
+          'menuRol.idMenu': 0,
+          'menuRol.idRol': 0,
+          'menuRol.menu.idRol': 0,
+        },
+      },
     ]);
 
-    // Si el array está vacío, significa que no se encontró el usuario
-    if (joinData.length === 0) {
-      return null;  // Si no se encuentra el usuario, devuelve null
-    }
-
-    return joinData[0];  // Devuelve el primer resultado, ya que es un solo usuario
+    return joinData.length > 0 ? joinData[0] : null;
   } catch (error) {
-    console.error('Error al ejecutar aggregate:', error);
-    throw error;  // Lanza el error para que sea manejado en el controlador
+    console.error('Error en findOneData:', error);
+    throw error;
   }
 };
+
+
 
 // Hook para encriptar la contraseña antes de guardar
 UsersScheme.pre('save', async function (next) {
   const user = this;
-  if (!user.isModified('clave')) return next();  // Si la contraseña no fue modificada, seguimos
+  if (!user.isModified('clave')) return next();
 
   try {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(user.clave, salt);
-    user.clave = hashedPassword;  // Guardamos la contraseña encriptada
+    user.clave = await bcrypt.hash(user.clave, salt);
     next();
   } catch (error) {
     next(error);
@@ -131,5 +258,4 @@ UsersScheme.plugin(mongooseDelete, { overrideMethods: 'all' });
 // Crear el modelo
 const UsersModel = mongoose.model('Usuarios', UsersScheme);
 
-// Exportar el modelo
 module.exports = UsersModel;

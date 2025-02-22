@@ -8,6 +8,7 @@ const { CategoriasModel } = require('../models');  // Asegúrate de que el model
 const getItems = async (req, res) => {
   try {
     const user = req.user
+
     const data = await CategoriasModel.find({});  // Aquí usamos la función find
     console.log('Datos obtenidos:', data); // Log para verificar la respuesta
 

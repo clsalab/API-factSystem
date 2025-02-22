@@ -38,7 +38,10 @@ MenuRolScheme.statics.findAllData = async function () {
         },
       },
       {
-        $unwind: '$menu',
+        $unwind: {
+          path:'$menu',
+        preserveNullAndEmptyArrays: true,
+        }
       },
       {
         // Eliminar 'idRol' dentro de 'menu' si existe
@@ -53,7 +56,10 @@ MenuRolScheme.statics.findAllData = async function () {
         },
       },
       {
-        $unwind: '$rol',
+        $unwind: {
+          path: '$rol',
+        preserveNullAndEmptyArrays: true,
+        }
       },
       {
         $project: {  // Excluir campos no deseados si es necesario
@@ -87,7 +93,10 @@ MenuRolScheme.statics.findOneData = async function (id) {
         },
       },
       {
-        $unwind: '$menu',  // Desenrolla la relación con el menú
+        $unwind:{
+          path: '$menu',  // Desenrolla la relación con el menú
+        preserveNullAndEmptyArrays: true,
+        }
       },
       {
         // Eliminar 'idRol' dentro de 'menu' si existe
@@ -102,7 +111,10 @@ MenuRolScheme.statics.findOneData = async function (id) {
         },
       },
       {
-        $unwind: '$rol',  // Desenrolla la relación con el rol
+        $unwind: {
+        path:'$rol',  // Desenrolla la relación con el rol
+        preserveNullAndEmptyArrays: true,
+        }
       },
       {
         $project: {  // Excluir campos no deseados

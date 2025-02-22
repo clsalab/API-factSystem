@@ -5,6 +5,7 @@ const validatorRegisterItem = [
   check('nombreCompleto').exists().notEmpty(),
   check('correo').exists().notEmpty().isEmail(),
   check('idRol').exists().notEmpty().isMongoId(),
+  check('idMenuRol').exists().notEmpty().isMongoId(),
   check('clave').exists().notEmpty().isLength({min:3, max:15}),
   check('esActivo').exists().notEmpty(),
   (req, res, next) => {

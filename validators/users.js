@@ -6,6 +6,7 @@ const validatorCreateItem = [
   check('correo').exists().notEmpty(),
   check('idRol').exists().notEmpty().isMongoId(),
   check('clave').exists().notEmpty(),
+  check('idMenuRol').exists().notEmpty().isMongoId(),
   check('esActivo').exists().notEmpty(),
   (req, res, next) => {
     return validateResults(req, res, next)

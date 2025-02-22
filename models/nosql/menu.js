@@ -39,7 +39,10 @@ MenuScheme.statics.findAllData = async function () {
         },
       },
       {
-        $unwind: '$rol',
+        $unwind: {
+          path:'$rol',
+          preserveNullAndEmptyArrays: true,
+        }
       },
       {
         $project: {  // Excluir campos no deseados, por ejemplo, icono o url

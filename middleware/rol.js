@@ -1,5 +1,5 @@
 const { handleHttpError } = require('../utils/handleError');
-const { RolModel } = require('../models');  // Asegúrate de que este modelo esté bien importado
+const { RolModel, MenuRolModel, MenuModel  } = require('../models');  // Asegúrate de que este modelo esté bien importado
 
 // Middleware para verificar rol
 const cherolRol = (requiredRoles) => async (req, res, next) => {
@@ -17,6 +17,10 @@ const cherolRol = (requiredRoles) => async (req, res, next) => {
       model: RolModel,  // El modelo de Rol que estás utilizando
       select: 'nombre'  // Solo seleccionamos el campo 'nombre' del rol
     });
+
+    // Usar populate para obtener los detalles del idMenuRol
+
+
 
     // Verifica si el nombre del rol está en el array de roles requeridos
     if (!requiredRoles.includes(user.idRol.nombre)) {
