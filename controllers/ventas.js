@@ -6,7 +6,7 @@ const { VentasModel } = require('../models');
 const getItems = async (req, res) => {
   try {
     const user = req.user;  // Obtener el usuario de req.user
-    const data = await VentasModel.find({});  // Aquí usamos la función find para obtener todas las ventas
+    const data = await VentasModel.findAllData();  // Aquí usamos la función find para obtener todas las ventas
 
     res.send({ data, user });  // Enviar los datos junto con el usuario
   } catch (error) {
@@ -17,7 +17,7 @@ const getItems = async (req, res) => {
 const getItem = async (req, res) => {
   try {
     const user = req.user;  // Obtener el usuario de req.user
-    const data = await VentasModel.findById(req.params.id); // Busca la venta por ID
+    const data = await VentasModel.findOneData(req.params.id); // Busca la venta por ID
 
     if (!data) {
       return res.status(404).send({ message: 'Venta no encontrada' });

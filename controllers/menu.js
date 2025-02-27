@@ -6,7 +6,7 @@ const { MenuModel }  = require('../models');
 const getItems = async (req, res) => {
   try {
     const user = req.user;  // Obtener el usuario de req.user
-    const data = await MenuModel.findAllData();  // Aquí usamos la función find
+    const data = await MenuModel.find({});  // Aquí usamos la función find
     res.send({ data, user });  // Enviar los datos junto con el usuario
   } catch (error) {
     handleHttpError(res, "*** Error al consultar Menu ***");
@@ -16,7 +16,7 @@ const getItems = async (req, res) => {
 const getItem = async (req, res) => {
   try {
     const user = req.user;  // Obtener el usuario de req.user
-    const data = await MenuModel.findOneData(req.params.id); // Busca el Menu por ID
+    const data = await MenuModel.findById(req.params.id); // Busca el Menu por ID
     if (!data) return res.status(404).send({ message: 'Menu no encontrada' });
 
     res.send({ data, user });  // Enviar los datos junto con el usuario

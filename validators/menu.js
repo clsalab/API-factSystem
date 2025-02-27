@@ -3,7 +3,6 @@ const validateResults = require('../utils/handleValidator');
 
 const validatorCreateItem = [
   check('nombre').exists().notEmpty(),
-  check('idRol').exists().notEmpty().isMongoId(),
   check('icono').exists().notEmpty(),
   check('url').exists().notEmpty(),
   (req, res, next) => {

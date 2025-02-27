@@ -3,10 +3,11 @@ const validateResults = require('../utils/handleValidator');
 
 const validatorCreateItem = [
   check('numeroDocumento').exists().notEmpty(),
-  check('tipoPago').exists().notEmpty(),
+  check('tipoPago').optional().isIn(['Credito', 'SemiCredito', 'Efectivo']),
   check('total').exists().notEmpty(),
   check('precio').exists().notEmpty(),
   check('esActivo').exists().notEmpty(),
+  check('idDetallesVentas').exists().notEmpty().isMongoId(),
   (req, res, next) => {
     return validateResults(req, res, next)
   }

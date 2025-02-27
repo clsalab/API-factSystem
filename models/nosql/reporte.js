@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const mongooseDelete = require('mongoose-delete');
 
 // Definir el esquema de Ventas
-const VentasSchema = new mongoose.Schema(
+const ReporteSchema = new mongoose.Schema(
   {
     numeroDocumento: {
       type: String,
@@ -13,16 +13,27 @@ const VentasSchema = new mongoose.Schema(
       enum: ['Credito', 'SemiCredito', 'Efectivo'], // Usar enum para restringir los valores posibles
       default: 'Efectivo', // Valor por defecto si no se especifica
     },
+    totalVenta: {
+      type: Number,
+      required: true,
+    },
+    producto: {
+      type: Number,
+      required: true,
+    },
+    cantidad: {
+      type: Number,
+      required: true,
+    },
+    precio: {
+      type: Number,
+      required: true,
+    },
     total: {
       type: Number,
       required: true,
     },
-    // Referencia al modelo 'detallesventas'
-    idDetallesVentas: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'detallesventas',  // Asegúrate de que el nombre de la colección sea 'detallesventas'
-      required: true,
-    },
+
   },
   {
     timestamps: true,

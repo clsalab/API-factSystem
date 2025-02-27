@@ -21,12 +21,6 @@ const UsersScheme = new mongoose.Schema(
       required: true,
       index: true,
     },
-    idMenuRol: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'MenuRol',
-      required: true,
-      index: true,
-    },
     clave: {
       type: String,
       required: true,
@@ -64,70 +58,7 @@ UsersScheme.statics.findAllData = async function () {
           preserveNullAndEmptyArrays: true, // 🔹 Asegura que no se pierdan usuarios sin rol
         },
       },
-      {
-        $lookup: {
-          from: 'menurols',
-          localField: 'idMenuRol',
-          foreignField: '_id',
-          as: 'menuRol',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menuRol',
-          preserveNullAndEmptyArrays: true, // 🔹 Evita que se pierdan usuarios sin menú asignado
-        },
-      },
-      {
-        $lookup: {
-          from: 'menus',
-          localField: 'menuRol.idMenu',
-          foreignField: '_id',
-          as: 'menuRol.menu',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menuRol.menu',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'rols',
-          localField: 'menuRol.menu.idRol',
-          foreignField: '_id',
-          as: 'menuRol.menu.rol',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menuRol.menu.rol',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'rols',
-          localField: 'menuRol.idRol',
-          foreignField: '_id',
-          as: 'menuRol.rol',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menuRol.rol',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $project: {
-          clave: 0, // 🔹 Ocultamos la clave del usuario
-          'menuRol.idMenu': 0,
-          'menuRol.idRol': 0,
-          'menuRol.menu.idRol': 0,
-        },
-      },
+
     ]);
 
     return joinData;
@@ -162,71 +93,7 @@ UsersScheme.statics.findOneData = async function (id) {
           path: '$rol',
           preserveNullAndEmptyArrays: true,
         },
-      },
-      {
-        $lookup: {
-          from: 'menurols',
-          localField: 'idMenuRol',
-          foreignField: '_id',
-          as: 'menuRol',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menuRol',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'menus',
-          localField: 'menuRol.idMenu',
-          foreignField: '_id',
-          as: 'menuRol.menu',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menuRol.menu',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'rols',
-          localField: 'menuRol.menu.idRol',
-          foreignField: '_id',
-          as: 'menuRol.menu.rol',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menuRol.menu.rol',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $lookup: {
-          from: 'rols',
-          localField: 'menuRol.idRol',
-          foreignField: '_id',
-          as: 'menuRol.rol',
-        },
-      },
-      {
-        $unwind: {
-          path: '$menuRol.rol',
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      {
-        $project: {
-          clave: 0,
-          'menuRol.idMenu': 0,
-          'menuRol.idRol': 0,
-          'menuRol.menu.idRol': 0,
-        },
-      },
+      }
     ]);
 
     return joinData.length > 0 ? joinData[0] : null;
